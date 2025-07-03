@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caesar Cipher Tool</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      background: #222;
+      background-image: url(pexels-designecologist-1779487.jpg);
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-attachment: fixed;
+      background-size: cover;
+    }
+
+    body::before {
+      display: none;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      max-width: 500px;
+      margin: 5vh auto;
+      padding: 2.5rem 2rem 2rem 2rem;
+      background: rgba(30, 41, 59, 0.45);
+      border-radius: 22px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      align-items: stretch;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.4rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      letter-spacing: 1.5px;
+      color: #f3f6fa;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      color: #e0e7ef;
+      letter-spacing: 0.5px;
+    }
+
+    textarea, input, select {
+      font-size: 1.08rem;
+      padding: 0.8rem;
+      border: 1.5px solid #3b82f6;
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+      background: rgba(255,255,255,0.10);
+      color: #f3f6fa;
+      resize: none;
+      transition: border 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(31, 38, 135, 0.07);
+      outline: none;
+    }
+    textarea:focus, input:focus, select:focus {
+      border: 2px solid #1f6feb;
+      box-shadow: 0 0 0 2px #1f6feb33;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .form-row label {
+      flex: 1 0 120px;
+      margin-bottom: 0;
+    }
+    .form-row textarea,
+    .form-row input,
+    .form-row select {
+      flex: 2 0 150px;
+      margin-bottom: 0;
+    }
+
+    button {
+      background: linear-gradient(90deg, #1f6feb 60%, #3b82f6 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0.9rem 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(31, 38, 135, 0.10);
+      letter-spacing: 0.5px;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #3b82f6 60%, #1f6feb 100%);
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 6px 18px rgba(31, 38, 135, 0.18);
+    }
+
+    h3 {
+      margin-top: 1.2rem;
+      margin-bottom: 0.5rem;
+      font-size: 1.18rem;
+      color: #60a5fa;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    #result {
+      background: rgba(255,255,255,0.18);
+      color: #1e293b;
+      font-weight: 600;
+      min-height: 70px;
+      border-radius: 10px;
+      border: 1.2px solid #3b82f6;
+      box-shadow: 0 2px 8px rgba(31, 38, 135, 0.07);
+      padding: 0.8rem;
+      font-size: 1.08rem;
+      transition: border 0.2s;
+    }
+    #result:focus {
+      border: 2px solid #1f6feb;
+    }
+
+    ::placeholder {
+      color: #b6c2d1;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <h1>Caesar Cipher Encryption/Decryption</h1>
+
+    <div class="form-row">
+      <label for="text">Enter Text:</label>
+      <textarea id="text" rows="3"></textarea>
+    </div>
+
+    <div class="form-row">
+      <label for="shift">Shift Value:</label>
+      <input type="number" id="shift" value="3" />
+    </div>
+
+    <div class="form-row">
+      <label for="mode">Select Mode:</label>
+      <select id="mode">
+        <option value="encrypt">Encrypt</option>
+        <option value="decrypt">Decrypt</option>
+      </select>
+    </div>
+
+    <button onclick="processText()">Submit</button>
+
+    <h3>Result:</h3>
+    <textarea id="result" rows="3" readonly></textarea>
+  </div>
+
+  <script>
+    function caesarCipher(str, shift, mode) {
+      return str.replace(/[a-z]/gi, function(char) {
+        const start = char <= 'Z' ? 65 : 97;
+        let offset = char.charCodeAt(0) - start;
+        if (mode === 'decrypt') shift = -shift;
+        offset = (offset + shift + 26) % 26;
+        return String.fromCharCode(start + offset);
+      });
+    }
+
+    function processText() {
+      const text = document.getElementById('text').value;
+      const shift = parseInt(document.getElementById('shift').value, 10) || 0;
+      const mode = document.getElementById('mode').value;
+      const result = caesarCipher(text, shift, mode);
+      document.getElementById('result').value = result;
+    }
+  </script>
+</body>
+</html>
